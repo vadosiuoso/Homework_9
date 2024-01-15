@@ -14,34 +14,18 @@ public class HttpImageStatusCli {
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))){
             System.out.println("Enter HTTP status code");
             String input = reader.readLine();
-            if(checkStatus(input)){
-                HttpStatusImageDownloader httpStatusImageDownloader = new HttpStatusImageDownloader();
-                httpStatusImageDownloader.downloadStatusImage(Integer.parseInt(input));
+            int code = 0;
+            try{
+                code = Integer.parseInt(input);
+            }catch (NumberFormatException e){
+                throw new NumberFormatException("Please enter valid number");
             }
-        }catch (IOException e){
-            e.printStackTrace();
+            HttpStatusImageDownloader downloader = new HttpStatusImageDownloader();
+            downloader.downloadStatusImage(code);
+        }catch (IOException ignored){
+
         }
     }
 
 
-    private boolean checkStatus(String code){
-        String url = String.format("https://http.cat/%s.jpg", code);
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-
-        Call call = client.newCall(request);
-        try {
-            Response response = call.execute();
-            if(response.code() == 404){
-                System.out.println("There is not image for HTTP status <"+code+">");
-                return false;
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return true;
-    }
 }
