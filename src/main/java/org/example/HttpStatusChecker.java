@@ -1,7 +1,6 @@
 package org.example;
 
 import okhttp3.*;
-
 import java.io.IOException;
 
 public class HttpStatusChecker {
