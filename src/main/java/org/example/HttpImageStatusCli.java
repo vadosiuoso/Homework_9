@@ -1,26 +1,52 @@
 package org.example;
 
 import java.io.*;
+import java.util.Scanner;
 
 public class HttpImageStatusCli {
+    private final BufferedReader reader;
+    private final HttpStatusImageDownloader downloader;
 
+    public HttpImageStatusCli(){
+        reader = new BufferedReader(new InputStreamReader(System.in));
+        downloader = new HttpStatusImageDownloader();
+    }
     public void askStatus() {
-
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))){
-            System.out.println("Enter HTTP status code");
-            String input = reader.readLine();
-            int code = 0;
+        System.out.println("Enter HTTP status code");
+        while (true){
+            int code = input();
             try{
-                code = Integer.parseInt(input);
-            }catch (NumberFormatException e){
-                throw new NumberFormatException("Please enter valid number");
+                downloader.downloadStatusImage(code);
+                System.out.println("Image for HTTP status <"+code+"> downloaded successfully");
+            }catch (FileIsNotAvailableException e){
+                System.out.println("There is not image for HTTP status <"+code+">");
+                continue;
             }
-            HttpStatusImageDownloader downloader = new HttpStatusImageDownloader();
-            downloader.downloadStatusImage(code);
-        }catch (IOException ignored){
-
+            break;
         }
     }
 
+    private int input() {
+        while (true) {
+            try {
+                String input;
+                try {
+                    input = reader.readLine();
+                    return Integer.parseInt(input);
+                } catch (NumberFormatException e) {
+                    System.out.println("Please enter a valid number");
+                }
+            } catch (IOException e) {
+                System.out.println("Unknown error");
+            }
+        }
+    }
 
+    public void close(){
+        try {
+            reader.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

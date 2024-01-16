@@ -1,10 +1,12 @@
 package org.example;
 
 import okhttp3.*;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class HttpStatusChecker {
-    public String getStatusImage(int code){
+    public String getStatusImage(int code) throws FileIsNotAvailableException {
         String url = String.format("https://http.cat/%s.jpg", code);
         OkHttpClient client = new OkHttpClient();
 
@@ -16,7 +18,7 @@ public class HttpStatusChecker {
         try {
             Response response = call.execute();
             if(response.code() == 404){
-                throw new RuntimeException("There is not image for HTTP status <"+code+">");
+                throw new FileIsNotAvailableException();
             }
             response.close();
         } catch (IOException ignored) {
